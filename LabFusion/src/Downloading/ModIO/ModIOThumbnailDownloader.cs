@@ -6,6 +6,7 @@ using System.Collections;
 using System.Linq;
 
 using LabFusion.Preferences;
+using LabFusion.Utilities;
 
 namespace LabFusion.Downloading.ModIO;
 
@@ -30,6 +31,7 @@ public static class ModIOThumbnailDownloader
 
     public static void GetThumbnail(int modID, Action<Texture> callback)
     {
+        if (modID <= 0) FusionLogger.Error($"GetThumbnail called with invalid modID: {modID}");
         if (ThumbnailCache.TryGetValue(modID, out var cachedTexture))
         {
             callback?.Invoke(cachedTexture);

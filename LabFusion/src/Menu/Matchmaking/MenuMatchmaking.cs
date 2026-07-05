@@ -5,6 +5,7 @@ using LabFusion.Network;
 using LabFusion.Representation;
 using LabFusion.Safety;
 using LabFusion.SDK.Lobbies;
+using LabFusion.Utilities;
 
 using UnityEngine;
 
@@ -420,6 +421,7 @@ public static class MenuMatchmaking
         element.VersionText.text = string.Format($"v{metadata.LobbyInfo.LobbyVersion}");
         element.VersionText.color = versionColor;
 
+        if (metadata.LobbyInfo.LevelModID == -1) FusionLogger.Warn($"Lobby result has no modID: title={metadata.LobbyInfo.LevelTitle}");
         ElementIconHelper.SetLevelResultIcon(element, metadata.LobbyInfo.LevelTitle, metadata.LobbyInfo.LevelModID);
 
         // Gamemode icon
@@ -530,6 +532,7 @@ public static class MenuMatchmaking
             .WithTitle("More...")
             .Do(() => { element.LobbyPage.SelectSubPage(1); });
 
+        if (info.LobbyInfo.LevelModID == -1) FusionLogger.Warn($"Lobby detail has no modID: title={info.LobbyInfo.LevelTitle}");
         ElementIconHelper.SetLevelIcon(element, info.LobbyInfo.LevelTitle, info.LobbyInfo.LevelModID);
         ElementIconHelper.SetGamemodeIcon(element, info.LobbyInfo.GamemodeTitle);
 

@@ -134,7 +134,8 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /y /d &quot;$(ProjectDir)$(OutDir)$(AssemblyName).dll&quot; &quot;$(ProjectDir)..\LabFusion\SupportModules&quot;" />
+    <Exec Command="cp -f &quot;$(ProjectDir)$(OutDir)$(AssemblyName).dll&quot; &quot;$(ProjectDir)../LabFusion/SupportModules/&quot;" Condition="$([MSBuild]::IsOSPlatform('Linux'))" />
+    <Exec Command="xcopy /y /d &quot;$(ProjectDir)$(OutDir)$(AssemblyName).dll&quot; &quot;$(ProjectDir)..\LabFusion\SupportModules&quot;" Condition="$([MSBuild]::IsOSPlatform('Windows'))" />
   </Target>
 	
 </Project>
