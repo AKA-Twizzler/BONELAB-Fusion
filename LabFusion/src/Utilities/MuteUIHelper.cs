@@ -135,7 +135,11 @@ public static class MuteUIHelper
 
         // Add mute icon
         var openControllerRig = manager.ControllerRig.TryCast<OpenControllerRig>();
+        if (openControllerRig == null)
+            return;
         Transform headset = openControllerRig.headset;
+        if (headset == null)
+            return;
 
         var muteSpawnable = LocalAssetSpawner.CreateSpawnable(FusionSpawnableReferences.MuteIndicatorReference);
 

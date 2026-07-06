@@ -105,6 +105,11 @@ public static class TimeManagerPatches
     private static void ResetTimeScale()
     {
         Time.timeScale = 1f;
-        Time.fixedDeltaTime = 1f / MarrowGame.xr.Display.GetRecommendedPhysFrequency();
+        var freq = 90f;
+        if (MarrowGame.xr?.Display != null)
+            freq = MarrowGame.xr.Display.GetRecommendedPhysFrequency();
+        if (freq <= 0f)
+            freq = 90f;
+        Time.fixedDeltaTime = 1f / freq;
     }
 }

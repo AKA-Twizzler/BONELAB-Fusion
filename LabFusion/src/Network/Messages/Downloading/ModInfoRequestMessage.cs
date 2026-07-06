@@ -5,6 +5,7 @@ using LabFusion.Extensions;
 using LabFusion.Marrow;
 using LabFusion.Network.Serialization;
 using LabFusion.Player;
+using LabFusion.Utilities;
 
 namespace LabFusion.Network;
 
@@ -77,6 +78,7 @@ public class ModInfoRequestMessage : NativeMessageHandler
 
         if (modTarget == null)
         {
+            FusionLogger.Warn($"ModInfoRequest: No ModIOModTarget found for barcode '{data.Barcode}'. Mod must be installed through Fusion's download system to support auto-download.");
             return;
         }
 

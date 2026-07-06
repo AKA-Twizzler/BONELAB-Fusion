@@ -153,6 +153,8 @@ public static class PlayerRepUtilities
 
         // Remove camera stuff
         var headset = openControllerRig.headset;
+        if (headset == null)
+            return;
         GameObject.DestroyImmediate(headset.GetComponent<AudioListener>());
         GameObject.DestroyImmediate(headset.GetComponent<CameraSettings>());
         GameObject.DestroyImmediate(headset.GetComponent<StreamingController>());

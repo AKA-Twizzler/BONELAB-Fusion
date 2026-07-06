@@ -13,7 +13,10 @@ public static class RigAbstractor
 
     public static Transform GetSmoothTurnTransform(this RigManager manager)
     {
-        return manager.ControllerRig.TryCast<OpenControllerRig>().vrRoot.transform;
+        var rig = manager.ControllerRig.TryCast<OpenControllerRig>();
+        if (rig == null)
+            return null;
+        return rig.vrRoot.transform;
     }
 
     public static void FillTransformArray(ref Transform[] array, RigManager manager)
@@ -21,7 +24,8 @@ public static class RigAbstractor
         array = new Transform[TransformSyncCount];
 
         var rig = manager.ControllerRig.TryCast<OpenControllerRig>();
-
+        if (rig == null)
+            return;
         array[0] = rig.headset;
         array[1] = rig.leftController.transform;
         array[2] = rig.rightController.transform;
