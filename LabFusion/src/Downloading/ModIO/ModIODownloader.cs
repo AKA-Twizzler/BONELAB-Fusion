@@ -6,6 +6,9 @@ using LabFusion.Utilities;
 using MelonLoader;
 
 using System.Collections;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 
 namespace LabFusion.Downloading.ModIO;
 
@@ -189,14 +192,25 @@ public static class ModIODownloader
 
         // Send a request to mod.io for the headers
         // We don't want to read the whole content yet
-        var handler = new HttpClientHandler()
+        var handler = new SocketsHttpHandler
         {
-            ClientCertificateOptions = ClientCertificateOption.Manual,
-            ServerCertificateCustomValidationCallback = (_, _, _, _) => true
+            ConnectCallback = async (context, cancellationToken) =>
+            {
+                var hostEntry = await Dns.GetHostEntryAsync(context.DnsEndPoint.Host, cancellationToken);
+                var ipv4 = hostEntry.AddressList.First(ip => ip.AddressFamily == AddressFamily.InterNetwork);
+                var socket = new Socket(ipv4.AddressFamily, SocketType.Stream, ProtocolType.Tcp)
+                {
+                    NoDelay = true
+                };
+                await socket.ConnectAsync(new IPEndPoint(ipv4, context.DnsEndPoint.Port), cancellationToken);
+                return new NetworkStream(socket, true);
+            },
+            ConnectTimeout = TimeSpan.FromSeconds(15)
         };
 
         using HttpClient client = new(handler);
         client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
+        FusionLogger.Log($"Downloading mod {modFile.ModID} from {url}");
 
         var responseTask = client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
 
@@ -208,7 +222,7 @@ public static class ModIODownloader
         // Make sure the response was successful
         if (!responseTask.IsCompletedSuccessfully)
         {
-            FusionLogger.LogException("getting response from mod.io", responseTask.Exception);
+            FusionLogger.Error($"Download failed for mod {modFile.ModID}: HTTP response error");
 
             FailDownload();
 
@@ -255,6 +269,8 @@ public static class ModIODownloader
                 yield break;
             }
         }
+
+        FusionLogger.Log($"Downloaded mod {modFile.ModID}: {new FileInfo(zipPath).Length} bytes");
 
         // Set progress to 100%
         transaction.Report(1f);
