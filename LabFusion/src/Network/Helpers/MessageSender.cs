@@ -1,4 +1,5 @@
 ﻿using LabFusion.Player;
+using LabFusion.Utilities;
 
 namespace LabFusion.Network;
 
@@ -101,6 +102,8 @@ public static class MessageSender
             NetworkInfo.BytesUp += message.Length;
 
             NetworkLayerManager.Layer.BroadcastMessage(channel, message);
+
+            FusionLogger.Log($"BroadcastMessage: channel={channel}, size={message.Length}");
 
             // Backup incase the message cannot be sent to the host, which this targets.
             if (!NetworkInfo.ServerCanSendToHost && NetworkInfo.IsHost)

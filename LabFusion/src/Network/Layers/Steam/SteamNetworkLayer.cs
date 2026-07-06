@@ -25,6 +25,10 @@ public abstract class SteamNetworkLayer : NetworkLayer
     public override bool IsHost => _isServerActive;
     public override bool IsClient => _isConnectionActive;
 
+    // Goldberg self-connection fallback: ensures host handles messages locally
+    // instead of relying on the Steam P2P self-connection (broken on Goldberg)
+    public override bool ServerCanSendToHost => false;
+
     private INetworkLobby _currentLobby;
     public override INetworkLobby Lobby => _currentLobby;
 
@@ -250,10 +254,17 @@ public abstract class SteamNetworkLayer : NetworkLayer
     public override void StartServer()
     {
         SteamSocket = SteamNetworkingSockets.CreateRelaySocket<SteamSocketManager>(0);
+        FusionLogger.Log($"Steam relay socket created.");
 
         // Host needs to connect to own socket server with a ConnectionManager to send/receive messages
         // Relay Socket servers are created/connected to through SteamIds rather than "Normal" Socket Servers which take IP addresses
         SteamConnection = SteamNetworkingSockets.ConnectRelay<SteamConnectionManager>(SteamId);
+
+        if (SteamConnection == null || !SteamConnection.Connected)
+            FusionLogger.Error("Steam self-connection FAILED! Host will not receive broadcast messages.");
+        else
+            FusionLogger.Log("Steam self-connection established successfully.");
+
         _isServerActive = true;
         _isConnectionActive = true;
 

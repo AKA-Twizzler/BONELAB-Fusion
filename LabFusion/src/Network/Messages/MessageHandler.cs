@@ -52,6 +52,7 @@ public abstract class MessageHandler
         // Hook the awaitable attribute so that we can handle the message when its ready
         if (awaitable != null)
         {
+            FusionLogger.Warn($"Message delayed: {GetType().Name} waiting for target to finish loading");
             awaitable.HookComplete(() => { FinishHandlingMessage(received); });
         }
         else
