@@ -137,7 +137,11 @@ public static partial class FusionSceneManager
         // If we aren't loading and we have a target scene, change to it
         if (IsDelayedLoadDone() && !_hasStartedDownloadingTarget && !_hasStartedLoadingTarget && !string.IsNullOrEmpty(_targetServerScene))
         {
+            FusionLogger.Log($"Internal_UpdateTargetScene: checking for level barcode '{_targetServerScene}'");
+
             bool hasLevel = CrateFilterer.HasCrate<LevelCrate>(new(_targetServerScene));
+
+            FusionLogger.Log($"Internal_UpdateTargetScene: hasLevel = {hasLevel}, shouldDownload = {ClientSettings.Downloading.DownloadLevels.Value}");
 
             if (hasLevel)
             {
@@ -172,6 +176,8 @@ public static partial class FusionSceneManager
 
     private static void OnDownloadSucceeded() 
     {
+        FusionLogger.Log("OnDownloadSucceeded: Level download completed successfully");
+
         // We can now load the level
         // Hook the level load incase we're in the loading screen
         HookOnDelayedLevelLoad(LoadTargetScene);
@@ -181,6 +187,8 @@ public static partial class FusionSceneManager
 
     private static void OnDownloadFailed()
     {
+        FusionLogger.Error("OnDownloadFailed: Level download failed");
+
         NetworkHelper.Disconnect("The server's level failed to install!");
 
         _hasStartedDownloadingTarget = false;
@@ -188,6 +196,8 @@ public static partial class FusionSceneManager
 
     private static void OnDownloadCanceled()
     {
+        FusionLogger.Warn("OnDownloadCanceled: Level download was canceled");
+
         _hasStartedDownloadingTarget = false;
     }
 

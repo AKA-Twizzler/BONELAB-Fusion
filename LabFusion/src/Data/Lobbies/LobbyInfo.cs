@@ -6,6 +6,7 @@ using LabFusion.Representation;
 using LabFusion.Scene;
 using LabFusion.SDK.Gamemodes;
 using LabFusion.Senders;
+using LabFusion.Utilities;
 
 using System.Text.Json.Serialization;
 
@@ -135,6 +136,11 @@ public class LobbyInfo
         LevelBarcode = FusionSceneManager.Barcode;
 
         LevelModID = CrateFilterer.GetModID(FusionSceneManager.Level.Pallet);
+
+        if (LevelModID == -1)
+            FusionLogger.Warn($"WriteLobby: GetModID returned -1 for barcode '{LevelBarcode}', title '{LevelTitle}'");
+        else
+            FusionLogger.Log($"WriteLobby: LevelModID = {LevelModID} for '{LevelTitle}'");
 
         // Gamemode
         GamemodeTitle = string.Empty;

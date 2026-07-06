@@ -124,16 +124,22 @@ public static class ModIOManager
         }
 
         // Convert to ModData
-        var jObject = JObject.Parse(jsonTask.Result);
-
-        var modData = new ModData(jObject);
-        var modCallbackInfo = new ModCallbackInfo()
+        try
         {
-            Data = modData,
-            Result = ModResult.SUCCEEDED,
-        };
-
-        modCallback?.Invoke(modCallbackInfo);
+            var jObject = JObject.Parse(jsonTask.Result);
+            var modData = new ModData(jObject);
+            var modCallbackInfo = new ModCallbackInfo()
+            {
+                Data = modData,
+                Result = ModResult.SUCCEEDED,
+            };
+            modCallback?.Invoke(modCallbackInfo);
+        }
+        catch (Exception e)
+        {
+            FusionLogger.Error($"Failed to parse mod.io mod data JSON: {e.Message}");
+            modCallback?.Invoke(ModCallbackInfo.FailedCallback);
+        }
     }
 
     public static string GetActivePlatform()

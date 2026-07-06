@@ -60,8 +60,19 @@ public sealed class SteamMatchmaker : IMatchmaker
 
         foreach (var lobby in lobbies)
         {
-            // Make sure this is not us
-            if (lobby.Owner.IsMe)
+            // Make sure this is not us — wrapped in try-catch for Steam emulator compat
+            bool isMe;
+            try
+            {
+                isMe = lobby.Owner.IsMe;
+            }
+            catch (Exception e)
+            {
+                FusionLogger.Warn($"Failed to check lobby owner (emulator compatibility): {e.GetType().Name}");
+                continue;
+            }
+
+            if (isMe)
             {
                 continue;
             }

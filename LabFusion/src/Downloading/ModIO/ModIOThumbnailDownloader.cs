@@ -31,7 +31,11 @@ public static class ModIOThumbnailDownloader
 
     public static void GetThumbnail(int modID, Action<Texture> callback)
     {
-        if (modID <= 0) FusionLogger.Error($"GetThumbnail called with invalid modID: {modID}");
+        if (modID <= 0) 
+        { 
+            FusionLogger.Error($"GetThumbnail called with invalid modID: {modID}");
+            return;
+        }
         if (ThumbnailCache.TryGetValue(modID, out var cachedTexture))
         {
             callback?.Invoke(cachedTexture);
@@ -99,6 +103,15 @@ public static class ModIOThumbnailDownloader
             yield return null;
         }
 
+        if (!responseTask.Result.IsSuccessStatusCode)
+        {
+            FusionLogger.Warn($"CoDownloadThumbnail: HTTP {responseTask.Result.StatusCode} from {url}");
+        }
+        else
+        {
+            FusionLogger.Log($"CoDownloadThumbnail: Got response from {url}");
+        }
+
         var content = responseTask.Result.Content;
 
         var bytesTask = content.ReadAsByteArrayAsync();
@@ -109,6 +122,8 @@ public static class ModIOThumbnailDownloader
         }
 
         var bytes = bytesTask.Result;
+
+        FusionLogger.Log($"CoDownloadThumbnail: Downloaded {bytes.Length} bytes from thumbnail URL");
 
         var texture = new Texture2D(1, 1);
 

@@ -51,6 +51,8 @@ public static class LevelDownloaderManager
         // Get the maximum amount of bytes that we download before cancelling, to make sure the level isn't too big
         long maxBytes = DataConversions.ConvertMegabytesToBytes(ClientSettings.Downloading.MaxLevelSize.Value);
 
+        FusionLogger.Log($"DownloadLevel: Starting download for barcode '{_downloadingBarcode}', maxBytes = {maxBytes}");
+
         // Request the mod id from the host
         NetworkModRequester.RequestAndInstallMod(new NetworkModRequester.ModInstallInfo()
         {
@@ -71,11 +73,15 @@ public static class LevelDownloaderManager
 
         NetworkSceneManager.Purgatory = true;
 
+        FusionLogger.Log($"OnDownloadBegin: Purgatory = true, downloading mod {_downloadingFile.ModID}");
+
         LoadWaitingScene();
     }
 
     private static void OnDownloadFinished(DownloadCallbackInfo info)
     {
+        FusionLogger.Log($"OnDownloadFinished: Result = {info.Result}");
+
         NetworkSceneManager.Purgatory = false;
 
         _downloadingLevel = false;

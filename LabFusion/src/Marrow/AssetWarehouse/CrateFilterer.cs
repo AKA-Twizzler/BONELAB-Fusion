@@ -1,6 +1,7 @@
 ﻿using Il2CppSLZ.Marrow.Warehouse;
 
 using LabFusion.Downloading.ModIO;
+using LabFusion.Utilities;
 
 namespace LabFusion.Marrow;
 
@@ -13,6 +14,7 @@ public static class CrateFilterer
 
         if (manifest == null)
         {
+            FusionLogger.Warn($"GetModID: manifest is null for pallet barcode '{(pallet != null ? pallet.Barcode : "null")}'");
             return -1;
         }
 
@@ -22,6 +24,7 @@ public static class CrateFilterer
 
         if (modTarget == null)
         {
+            FusionLogger.Warn($"GetModID: no ModIOModTarget found for manifest of pallet barcode '{(pallet != null ? pallet.Barcode : "null")}'");
             return -1;
         }
 

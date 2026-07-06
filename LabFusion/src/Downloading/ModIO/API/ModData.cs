@@ -50,6 +50,6 @@ public readonly struct ModData
 
         Platforms = modPlatformList;
 
-        ThumbnailUrl = token["logo"]["thumb_640x360"].ToString();
+        ThumbnailUrl = token["logo"]?["thumb_640x360"]?.ToString() ?? string.Empty;
     }
 }
