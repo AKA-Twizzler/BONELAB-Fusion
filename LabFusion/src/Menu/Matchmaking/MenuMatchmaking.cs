@@ -1,11 +1,14 @@
 ﻿using LabFusion.Data;
 using LabFusion.Extensions;
+using LabFusion.Marrow;
 using LabFusion.Marrow.Proxies;
 using LabFusion.Network;
 using LabFusion.Representation;
 using LabFusion.Safety;
 using LabFusion.SDK.Lobbies;
 using LabFusion.Utilities;
+
+using Il2CppSLZ.Marrow.Warehouse;
 
 using UnityEngine;
 
@@ -421,8 +424,20 @@ public static class MenuMatchmaking
         element.VersionText.text = string.Format($"v{metadata.LobbyInfo.LobbyVersion}");
         element.VersionText.color = versionColor;
 
-        if (metadata.LobbyInfo.LevelModID == -1) FusionLogger.Warn($"Lobby result has no modID: title={metadata.LobbyInfo.LevelTitle}");
-        ElementIconHelper.SetLevelResultIcon(element, metadata.LobbyInfo.LevelTitle, metadata.LobbyInfo.LevelModID);
+        int modId = metadata.LobbyInfo.LevelModID;
+        if (modId == -1 && metadata.ClientHasLevel)
+        {
+            var crate = CrateFilterer.GetCrate<LevelCrate>(new(metadata.LobbyInfo.LevelBarcode));
+            if (crate?.Pallet != null)
+            {
+                modId = CrateFilterer.GetModID(crate.Pallet);
+                if (modId == -1)
+                    FusionLogger.Warn($"ApplyLobbyToResult: installed level '{metadata.LobbyInfo.LevelTitle}' has barcode but no ModIOModTarget");
+            }
+        }
+        if (modId == -1)
+            FusionLogger.Warn($"Lobby result has no modID: title={metadata.LobbyInfo.LevelTitle}");
+        ElementIconHelper.SetLevelResultIcon(element, metadata.LobbyInfo.LevelTitle, modId);
 
         // Gamemode icon
         var gamemodeIcon = MenuResources.GetGamemodeIcon(MenuResources.SandboxIconTitle);
@@ -532,8 +547,20 @@ public static class MenuMatchmaking
             .WithTitle("More...")
             .Do(() => { element.LobbyPage.SelectSubPage(1); });
 
-        if (info.LobbyInfo.LevelModID == -1) FusionLogger.Warn($"Lobby detail has no modID: title={info.LobbyInfo.LevelTitle}");
-        ElementIconHelper.SetLevelIcon(element, info.LobbyInfo.LevelTitle, info.LobbyInfo.LevelModID);
+        int modId = info.LobbyInfo.LevelModID;
+        if (modId == -1 && info.ClientHasLevel)
+        {
+            var crate = CrateFilterer.GetCrate<LevelCrate>(new(info.LobbyInfo.LevelBarcode));
+            if (crate?.Pallet != null)
+            {
+                modId = CrateFilterer.GetModID(crate.Pallet);
+                if (modId == -1)
+                    FusionLogger.Warn($"ApplyServerMetadataToLobby: installed level '{info.LobbyInfo.LevelTitle}' has barcode but no ModIOModTarget");
+            }
+        }
+        if (modId == -1)
+            FusionLogger.Warn($"Lobby detail has no modID: title={info.LobbyInfo.LevelTitle}");
+        ElementIconHelper.SetLevelIcon(element, info.LobbyInfo.LevelTitle, modId);
         ElementIconHelper.SetGamemodeIcon(element, info.LobbyInfo.GamemodeTitle);
 
         // Fill out lists
