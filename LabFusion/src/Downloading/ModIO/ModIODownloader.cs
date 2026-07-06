@@ -162,12 +162,8 @@ public static class ModIODownloader
                 // If the token is null, it likely didn't load
                 if (string.IsNullOrWhiteSpace(token))
                 {
-#if DEBUG
-                    FusionLogger.Warn("Token is null, cancelling mod download.");
-#endif
-
+                    FusionLogger.Error("Token is null, cancelling mod download.");
                     FailDownload();
-
                     return;
                 }
 

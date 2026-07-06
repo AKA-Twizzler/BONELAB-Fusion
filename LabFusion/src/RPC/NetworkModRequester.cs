@@ -76,7 +76,7 @@ public static class NetworkModRequester
         });
 
         // Wait for timeout
-        while (!receivedCallback && elapsed < 5f)
+        while (!receivedCallback && elapsed < 30f)
         {
             elapsed += TimeReferences.DeltaTime;
             yield return null;
@@ -85,9 +85,7 @@ public static class NetworkModRequester
         // No callback means this request timed out
         if (!receivedCallback)
         {
-#if DEBUG
-            FusionLogger.Warn($"Mod request for {installInfo.Barcode} timed out.");
-#endif
+            FusionLogger.Warn($"Mod request for {installInfo.Barcode} timed out after {elapsed:F1}s.");
 
             installInfo.FinishDownloadCallback?.Invoke(DownloadCallbackInfo.FailedCallback);
 
@@ -102,9 +100,7 @@ public static class NetworkModRequester
 
             if (!info.HasFile)
             {
-#if DEBUG
-                FusionLogger.Warn("Mod info did not have a file, cancelling download.");
-#endif
+                FusionLogger.Warn($"Mod info for {installInfo.Barcode} did not have a file, cancelling download.");
 
                 installInfo.FinishDownloadCallback?.Invoke(DownloadCallbackInfo.FailedCallback);
                 return;
